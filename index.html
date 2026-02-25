@@ -7,6 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Evalúa tu confianza digital | Igualdad Digital</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -42,7 +43,7 @@
 <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
 
   <!-- WELCOME -->
-    <div class="grid grid-cols-1 gap-6 mb-8">
+  <div id="welcomeScreen" class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 fade-in">
 
       <div class="flex justify-center mb-8">
@@ -59,7 +60,8 @@
         <p class="text-gray-600">No es un examen. No hay respuestas buenas o malas.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- ✅ 1 columna SIEMPRE -->
+      <div class="grid grid-cols-1 gap-6 mb-8">
         <div class="bg-blue-50 rounded-2xl p-6">
           <h2 class="text-lg font-semibold text-blue-900 mb-2">🙋‍♀️ ¿Cómo te llamas? (opcional)</h2>
           <p class="text-sm text-gray-700 mb-3">
@@ -82,7 +84,7 @@
                   <div class="font-semibold text-gray-800">Android</div>
                   <div class="text-sm text-gray-600">Samsung, Xiaomi, Huawei, etc.</div>
                 </div>
-                <div class="">
+                <div>
                   <!-- Android SVG -->
                   <svg viewBox="0 0 24 24" class="w-7 h-7" aria-hidden="true">
                     <path fill="#3DDC84" d="M8.2 6.3 6.8 4.1c-.2-.3-.1-.7.2-.9.3-.2.7-.1.9.2l1.4 2.2c.8-.3 1.7-.5 2.7-.5s1.9.2 2.7.5l1.4-2.2c.2-.3.6-.4.9-.2.3.2.4.6.2.9l-1.4 2.2c1.6.9 2.7 2.5 2.9 4.4H5.3c.2-1.9 1.3-3.5 2.9-4.4z"/>
@@ -91,7 +93,8 @@
                     <circle cx="14.8" cy="9.2" r="0.8" fill="#ffffff"/>
                   </svg>
                 </div>
-              <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div>
+              </div>
             </button>
 
             <button type="button" class="option-card border-2 border-transparent rounded-xl p-4 bg-white text-left"
@@ -101,14 +104,15 @@
                   <div class="font-semibold text-gray-800">iPhone (iOS)</div>
                   <div class="text-sm text-gray-600">Apple</div>
                 </div>
-                <div class="">
+                <div>
                   <!-- Apple SVG -->
                   <svg viewBox="0 0 24 24" class="w-7 h-7" aria-hidden="true">
                     <path fill="#111827" d="M16.9 13.1c0 2.6 2.3 3.5 2.3 3.6-.0.1-.4 1.3-1.3 2.6-.8 1.1-1.7 2.2-3.1 2.2-1.3 0-1.7-.8-3.2-.8-1.4 0-2 .8-3.2.8-1.3 0-2.3-1.2-3.1-2.3-1.7-2.4-3-6.7-1.3-9.6.8-1.4 2.2-2.3 3.8-2.3 1.2 0 2.3.8 3.2.8.9 0 2.3-.9 3.9-.8.7 0 2.6.3 3.8 2-0.1.1-2.2 1.3-2.2 3.8z"/>
                     <path fill="#111827" d="M14.9 4.2c.7-.9 1.2-2.1 1.1-3.3-1 .0-2.2.7-2.9 1.6-.6.7-1.2 2-1 3.1 1.1.1 2.2-.6 2.8-1.4z"/>
                   </svg>
                 </div>
-              <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div>
+              </div>
             </button>
 
             <button type="button" class="option-card border-2 border-transparent rounded-xl p-4 bg-white text-left"
@@ -119,7 +123,8 @@
                   <div class="text-sm text-gray-600">No pasa nada, te guiaremos igual</div>
                 </div>
                 <div class="text-2xl">❓</div>
-              <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div>
+              </div>
             </button>
           </div>
         </div>
@@ -142,6 +147,7 @@
         </button>
         <p id="startHint" class="text-sm text-gray-600 mt-3">Selecciona tu dispositivo para empezar.</p>
       </div>
+
     </div>
   </div>
 
@@ -439,6 +445,7 @@
   // START
   // =========================
   function startTest() {
+    if (!deviceType) return; // ✅ evita inicio sin dispositivo
     userName = (document.getElementById("nameInput").value || "").trim();
     answers = new Array(questions.length).fill(null);
     currentQuestionIndex = 0;
@@ -772,7 +779,6 @@
         const first = links[0];
         const courseTitle = first ? first.name : `Curso recomendado (Módulo ${module})`;
         const courseUrl = first ? first.url : "https://aulavirtual.afundacion.org/igualdad-digital/";
-
         const imgUrl = courseImageGuess(courseUrl);
 
         const card = document.createElement("a");
@@ -832,13 +838,9 @@
     }
   }
 
-  // Heurística simple: intenta usar la imagen destacada del producto de WP/Elementor vía og:image (no accesible sin fetch),
-  // así que aquí ponemos una imagen "fallback" estética basada en módulo/tema.
+  // Fallbacks de imagen (placeholder público)
   function courseImageGuess(url) {
-    // Si quieres, puedes sustituir esto por URLs reales de imágenes del catálogo.
-    // Fallback seguro (placeholder público):
     const base = "https://images.unsplash.com/";
-    // pequeñas variaciones por tipo
     if (url.includes("ciberseguridad") || url.includes("policia")) return base + "photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=60";
     if (url.includes("banca") || url.includes("cajero")) return base + "photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=1200&q=60";
     if (url.includes("whatsapp") || url.includes("redes")) return base + "photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=60";
@@ -882,7 +884,6 @@
     renderPlan(itinerary);
   }
 </script>
+
 </body>
 </html>
-
-
