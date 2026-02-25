@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Evalúa tu confianza digital | Igualdad Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Variables de marca Afundación */
+    :root {
+      --afundacion-primary: #0066A1;
+      --afundacion-primary-dark: #004d7a;
+      --afundacion-secondary: #00A0DC;
+      --afundacion-light: #E6F3F9;
+      --afundacion-bg: #F5F8FA;
+    }
+    
+    * { font-family: 'Montserrat', sans-serif; }
+    
+    .fade-in { animation: fadeIn 0.45s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(14px);} to { opacity: 1; transform: translateY(0);} }
+
+    .option-card { transition: all 0.22s ease; cursor: pointer; }
+    .option-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,102,161,0.15); }
+    .option-card.selected { 
+      border-color: var(--afundacion-primary); 
+      background-color: var(--afundacion-light); 
+      box-shadow: 0 0 0 3px rgba(0, 102, 161, 0.2); 
+    }
+
+    .progress-bar { transition: width 0.35s ease; }
+
+    /* Auto-advance micro animation */
+    .advance-pop { animation: pop 0.26s ease-out; }
+    @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.015);} 100%{transform:scale(1);} }
+
+    .question-transition-out { animation: qOut 0.18s ease-in forwards; }
+    @keyframes qOut { from{opacity:1; transform:translateY(0);} to{opacity:0; transform:translateY(-10px);} }
+
+    .question-transition-in { animation: qIn 0.24s ease-out; }
+    @keyframes qIn { from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
+  
+    /* Device selection animation */
+    .device-pop { animation: devicePop 260ms ease-out; }
+    @keyframes devicePop { 0%{transform:scale(1);} 60%{transform:scale(1.03);} 100%{transform:scale(1);} }
+    .device-selected-indicator { opacity: 0; transform: translateY(4px); transition: all 220ms ease; }
+    .option-card.selected .device-selected-indicator { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen" style="background: var(--afundacion-bg);">
+  <!-- WELCOME -->
+  <div id="welcomeScreen" class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 fade-in">
+      <div class="flex justify-center mb-10">
+        <img src="logo_afundacion_transp.png" alt="Afundación Obra Social ABANCA" class="h-24 md:h-28">
+      </div>
+
+      <div class="text-center mb-10">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: var(--afundacion-primary);">Test de competencia digital</h1>
+        <div class="w-24 h-1 mx-auto mb-6" style="background: var(--afundacion-secondary);"></div>
+
+        <p class="text-lg text-gray-700 mb-4">Este sencillo test del programa <strong>Igualdad Digital</strong> te permitirá evaluar tu nivel de confianza a la hora de usar la tecnología y te ofrecerá un plan personalizado para avanzar paso a paso.</p>
+<p class="text-gray-600">No es un examen. No hay respuestas buenas o malas.</p>
+<p class="text-gray-600">No es un examen. No hay respuestas buenas o malas.</p>
+      </div>
+
+      <div class="space-y-6 mb-8 max-w-2xl mx-auto">
+        <div class="rounded-2xl p-6 border" style="background: var(--afundacion-light); border-color: var(--afundacion-secondary);">
+          <h2 class="text-lg font-semibold mb-2" style="color: var(--afundacion-primary);">🙋‍♀️ ¿Cómo te llamas? (opcional)</h2>
+          <p class="text-sm text-gray-700 mb-3">
+            No guardamos datos personales. El nombre solo se utiliza para mostrar un resultado más personalizado en esta página.
+            Puedes continuar sin escribirlo.
+          </p>
+          <input id="nameInput" type="text" placeholder="Tu nombre (opcional)"
+                 class="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 bg-white" 
+                 style="border-color: var(--afundacion-secondary); --tw-ring-color: var(--afundacion-primary);" />
+        </div>
+
+        <div class="rounded-2xl p-6 border" style="background: var(--afundacion-light); border-color: var(--afundacion-secondary);">
+          <h2 class="text-lg font-semibold mb-2" style="color: var(--afundacion-primary);">📱 ¿Qué dispositivo utilizas?</h2>
+          <p class="text-sm text-gray-700 mb-3">Así podremos recomendarte el curso más adecuado.</p>
+
+          <div class="grid grid-cols-1 gap-3" id="deviceOptions">
+            <button type="button" class="option-card border-2 rounded-xl p-4 bg-white text-left"
+                    onclick="selectDevice('android')" id="device-android" style="border-color: var(--afundacion-secondary);">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-gray-800">Android</div>
+                  <div class="text-sm text-gray-600">Samsung, Xiaomi, Huawei, etc.</div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class=""><svg viewBox="0 0 24 24" class="w-7 h-7" aria-hidden="true">
+  <path fill="#3DDC84" d="M8.2 6.3 6.8 4.1c-.2-.3-.1-.7.2-.9.3-.2.7-.1.9.2l1.4 2.2c.8-.3 1.7-.5 2.7-.5s1.9.2 2.7.5l1.4-2.2c.2-.3.6-.4.9-.2.3.2.4.6.2.9l-1.4 2.2c1.6.9 2.7 2.5 2.9 4.4H5.3c.2-1.9 1.3-3.5 2.9-4.4z"/>
+  <path fill="#3DDC84" d="M6 11.5h12v6.2c0 1.2-1 2.3-2.3 2.3H8.3C7 20 6 18.9 6 17.7v-6.2z"/>
+  <circle cx="9.2" cy="9.2" r="0.8" fill="#ffffff"/>
+  <circle cx="14.8" cy="9.2" r="0.8" fill="#ffffff"/>
+</svg></div>
+              </div>
+            </button>
+
+            <button type="button" class="option-card border-2 rounded-xl p-4 bg-white text-left"
+                    onclick="selectDevice('ios')" id="device-ios" style="border-color: var(--afundacion-secondary);">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-gray-800">iPhone (iOS)</div>
+                  <div class="text-sm text-gray-600">Apple</div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class=""><svg viewBox="0 0 24 24" class="w-7 h-7" aria-hidden="true">
+  <path fill="#111827" d="M16.9 13.1c0 2.6 2.3 3.5 2.3 3.6-.0.1-.4 1.3-1.3 2.6-.8 1.1-1.7 2.2-3.1 2.2-1.3 0-1.7-.8-3.2-.8-1.4 0-2 .8-3.2.8-1.3 0-2.3-1.2-3.1-2.3-1.7-2.4-3-6.7-1.3-9.6.8-1.4 2.2-2.3 3.8-2.3 1.2 0 2.3.8 3.2.8.9 0 2.3-.9 3.9-.8.7 0 2.6.3 3.8 2-0.1.1-2.2 1.3-2.2 3.8z"/>
+  <path fill="#111827" d="M14.9 4.2c.7-.9 1.2-2.1 1.1-3.3-1 .0-2.2.7-2.9 1.6-.6.7-1.2 2-1 3.1 1.1.1 2.2-.6 2.8-1.4z"/>
+</svg></div>
+              </div>
+            </button>
+
+            <button type="button" class="option-card border-2 rounded-xl p-4 bg-white text-left"
+                    onclick="selectDevice('unknown')" id="device-unknown" style="border-color: var(--afundacion-secondary);">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-gray-800">No lo sé</div>
+                  <div class="text-sm text-gray-600">No pasa nada, te guiaremos igual</div>
+                <div class="device-selected-indicator text-blue-700 font-bold text-lg ml-3">✓</div></div>
+                <div class="text-2xl">❓</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border rounded-2xl p-5 mb-8 max-w-2xl mx-auto" style="border-color: var(--afundacion-secondary);">
+        <div class="flex items-start gap-3">
+          <div class="text-2xl">🕒</div>
+          <div>
+            <p class="text-gray-800 font-semibold">Duración estimada: 3–5 minutos</p>
+            <p class="text-gray-600 text-sm">Responde pensando en tu autonomía actual (sin prisas).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button id="startBtn" onclick="startTest()" disabled
+                class="text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:cursor-not-allowed disabled:transform-none disabled:opacity-50"
+                style="background: var(--afundacion-primary);">
+          🚀 Comenzar el test
+        </button>
+        <p id="startHint" class="text-sm text-gray-600 mt-3">Selecciona tu dispositivo para empezar.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST -->
+  <div id="testScreen" class="container mx-auto px-4 py-8 max-w-4xl hidden">
+    <div id="testCard" class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 fade-in">
+      <div class="flex justify-center mb-8">
+        <img src="logo_afundacion_transp.png" alt="Afundación Obra Social ABANCA" class="h-20 md:h-24">
+      </div>
+
+      <div class="mb-8">
+        <div class="flex justify-between text-sm text-gray-600 mb-2">
+          <span>Pregunta <span id="currentQuestion">1</span> de <span id="totalQuestions">24</span></span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div id="progressBar" class="progress-bar h-3 rounded-full" style="width: 0%; background: var(--afundacion-primary);"></div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <span id="themeBadge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold" 
+              style="background: var(--afundacion-light); color: var(--afundacion-primary);"></span>
+      </div>
+
+      <div class="flex items-start gap-5 mb-6">
+        <div class="w-24 h-24 rounded-2xl flex items-center justify-center shrink-0" 
+             style="background: var(--afundacion-light); border: 2px solid var(--afundacion-secondary);">
+          <div id="questionIcon" class="w-16 h-16" style="color: var(--afundacion-primary);"></div>
+        </div>
+        <h2 id="questionText" class="text-2xl md:text-3xl font-bold text-gray-800 leading-snug"></h2>
+      </div>
+
+      <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"></div>
+
+      <div class="flex justify-between mt-8">
+        <button id="prevBtn" onclick="previousQuestion()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+          ← Anterior
+        </button>
+
+        <button id="nextBtn" onclick="nextQuestion()"
+                class="text-white font-semibold py-3 px-8 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style="background: var(--afundacion-primary);"
+                disabled>
+          Siguiente →
+        </button>
+
+        <button id="finishBtn" onclick="finishTest()"
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-all hidden">
+          ✓ Finalizar
+        </button>
+      </div>
+
+      <p class="text-sm text-gray-500 mt-5">
+        Al seleccionar una opción, avanzaremos automáticamente. Puedes usar "Anterior" si quieres cambiar tu respuesta.
+      </p>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsScreen" class="container mx-auto px-4 py-8 max-w-6xl hidden">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 fade-in">
+      <div class="flex justify-center mb-10">
+        <img src="logo_afundacion_transp.png" alt="Afundación Obra Social ABANCA" class="h-24 md:h-28">
+      </div>
+
+      <div class="text-center mb-10">
+        <h1 class="text-4xl md:text-5xl mb-4" style="color: var(--afundacion-primary); font-weight: 600;">🎉 Tus resultados</h1>
+        <div class="w-24 h-1 mx-auto mb-4" style="background: var(--afundacion-secondary);"></div>
+        <p id="resultsIntro" class="text-xl text-gray-700"></p>
+      </div>
+
+      <div class="rounded-2xl p-8 text-white text-center mb-10" style="background: var(--afundacion-primary);">
+        <h2 class="text-2xl font-bold mb-4"></h2>
+        <div id="donutContainer" class="flex justify-center"></div>
+        <p id="levelTitle" class="text-2xl font-bold mt-4"></p>
+        <p id="levelDescription" class="text-lg mt-2 opacity-95"></p>
+      </div>
+
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">📊 Tus áreas clave</h2>
+        <p class="text-gray-600 mb-5">
+          Estas barras resumen tu competencia en 5 áreas (no son un examen). Las más bajas indican por dónde empezar.
+        </p>
+        <div id="themeBars" class="space-y-4"></div>
+      </div>
+
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">🧭 Tu plan personalizado</h2>
+        <p class="text-gray-600 mb-6">
+          Te recomendamos estos cursos para reforzar tu confianza digital y avanzar a tu ritmo.
+        </p>
+        <div id="planContainer" class="space-y-6"></div>
+
+        <div class="mt-8 p-6 rounded-2xl border" style="background: var(--afundacion-light); border-color: var(--afundacion-secondary);">
+          <h3 class="text-lg font-semibold mb-2" style="color: var(--afundacion-primary);">👉 Explora Igualdad Digital</h3>
+          <p class="text-gray-700 mb-4">
+            Accede a los cursos, guarda tu progreso y aprende paso a paso.
+          </p>
+          <div class="flex justify-center">
+            <a href="https://aulavirtual.afundacion.org/igualdad-digital/" target="_blank"
+               class="inline-flex items-center justify-center text-white font-semibold py-3 px-5 rounded-xl transition-all"
+               style="background: var(--afundacion-primary);">
+              Ir a Igualdad Digital →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button onclick="resetTest()"
+                class="text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                style="background: var(--afundacion-primary);">
+          🔄 Repetir test
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // =========================
+  // STATE
+  // =========================
+  let currentQuestionIndex = 0;
+  let answers = [];
+  let userName = "";
+  let deviceType = null; // 'android' | 'ios' | 'unknown'
+
+  // Auto-advance
+  const AUTO_ADVANCE = true;
+  const AUTO_ADVANCE_DELAY_MS = 380;
+
+  // =========================
+  // THEMES (5)
+  // =========================
+  const THEME = {
+    MOBILE: "Uso del móvil",
+    COMM: "Comunicación",
+    SERVICES: "Trámites y servicios",
+    SECURITY: "Seguridad digital",
+    FINANCE: "Finanzas digitales"
+  };
+
+  // =========================
+  // ICONS (inline SVG) — mejorados
+  // =========================
+  const ICONS = {
+    phone: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="18" y="4" width="28" height="56" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="52" r="3"/><path d="M24 10h16" stroke="currentColor" stroke-width="2" fill="none"/></svg>`,
+    touch: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M32 8L28 18h8zM18 32L8 28v8zM32 56l4-10h-8zM46 32l10-4v8z" opacity="0.3"/><circle cx="32" cy="32" r="6"/></svg>`,
+    wifi: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M8 24c13-13 35-13 48 0M16 32c9-9 23-9 32 0M24 40c5-5 11-5 16 0" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="32" cy="48" r="4"/></svg>`,
+    settings: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 12v8M32 44v8M52 32h-8M20 32h-8M46 18l-5.6 5.6M23.6 40.4L18 46M46 46l-5.6-5.6M23.6 23.6L18 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+    download: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M32 12v32M20 36l12 12 12-12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 52h32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+    folder: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M8 16h20l4 6h24v32H8z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M8 22h48" stroke="currentColor" stroke-width="2"/></svg>`,
+    media: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="8" y="14" width="48" height="36" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M24 26l18 10-18 10z"/></svg>`,
+    map: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M12 12l10 4 20-8 10 4v40l-10-4-20 8-10-4z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M22 16v36M42 8v36" stroke="currentColor" stroke-width="2"/></svg>`,
+    accessibility: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><circle cx="32" cy="14" r="5"/><path d="M16 24h32M32 24v14M20 50l12-16 12 16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    appointment: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="10" y="10" width="44" height="44" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 6v8M44 6v8M10 22h44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24 34l6 6 12-12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    portal: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="12" y="12" width="40" height="40" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 22h24M20 32h24M20 42h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+    id: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="6" y="18" width="52" height="28" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="22" cy="32" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M38 26h12M38 32h12M38 38h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+    chat: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M54 14c0-2.2-1.8-4-4-4H14c-2.2 0-4 1.8-4 4v26c0 2.2 1.8 4 4 4h10l8 10 8-10h10c2.2 0 4-1.8 4-4V14z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 24h24M20 32h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+    share: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M32 44V12M20 24l12-12 12 12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 36v12c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V36" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+    video: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="8" y="18" width="36" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="3"/><path d="M44 26l12-6v24l-12-6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>`,
+    scam: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M32 18v16M32 42h.1" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M28 8h8l20 24-20 24h-8L8 32z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>`,
+    password: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="14" y="28" width="36" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 28V18c0-5.5 4.5-10 10-10s10 4.5 10 10v10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="32" cy="41" r="3"/><path d="M32 44v4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+    update: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M50 18v-8h-8M50 10C46 6 40 4 34 4 20 4 8 16 8 30s12 26 26 26c11 0 21-7 24-17" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    atm: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><rect x="16" y="6" width="32" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><rect x="22" y="14" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M22 36h20M22 42h20M22 48h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+    banking: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M8 24h48M12 24v24M52 24v24M22 24v24M32 24v24M42 24v24M8 24l24-14 24 14M8 48h48" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    transfer: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><path d="M16 22h32l-6-6M48 22l-6 6M16 42h32l-6 6M48 42l-6-6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    ai: `<svg viewBox="0 0 64 64" fill="currentColor" class="w-16 h-16"><circle cx="32" cy="32" r="16" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 8v8M32 48v8M56 32h-8M16 32H8M48 16l-5.7 5.7M21.7 42.3L16 48M48 48l-5.7-5.7M21.7 21.7L16 16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="32" r="6"/></svg>`
+  };
+
+  function iconSvg(key) { return ICONS[key] || ICONS.phone; }
+
+  // =========================
+  // PONDERACIÓN (módulos 0–7) — max ponderado 81
+  // =========================
+  const moduleWeights = { 0:1.3, 1:1.1, 2:0.9, 3:1.3, 4:1.0, 5:1.4, 6:1.3, 7:0.7 };
+
+  // =========================
+  // Cursos (prescripción) + filtro por dispositivo
+  // =========================
+  const courses = [
+    { module: 0, name: "Teléfonos móviles Android: empezando desde cero", url: "https://aulavirtual.afundacion.org/producto/telefono-movil-android-empezando-desde-cero/", devices: ["android"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/08/pexels-shvets-production-7545061-1536x1024.jpg" },
+    { module: 0, name: "Teléfonos móviles iOS: empezando desde cero", url: "https://aulavirtual.afundacion.org/producto/empezando_desde_cero/", devices: ["ios"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/08/pexels-shvets-production-7545061-1536x1024.jpg" },
+
+    { module: 1, name: "Tu día a día con el móvil Android: tu mejor aliado", url: "https://aulavirtual.afundacion.org/producto/tu-dia-a-dia-con-el-movil-android-tu-mejor-aliado/", devices: ["android"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/Android-Tu-mejor-aliado-300x200.jpg" },
+    { module: 1, name: "Tu día a día con el móvil iOS: tu mejor aliado", url: "https://aulavirtual.afundacion.org/producto/tu-dia-a-dia-con-el-movil-ios/", devices: ["ios"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/IOS-Tu-mejor-aliado-300x200.jpg" },
+
+    { module: 2, name: "Aplicaciones Android de ocio y bienestar", url: "https://aulavirtual.afundacion.org/producto/aplicaciones-android-de-ocio-y-bienestar/", devices: ["android"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/Android-Aplicaciones-300x200.jpg" },
+    { module: 2, name: "Aplicaciones iOS de ocio y bienestar", url: "https://aulavirtual.afundacion.org/producto/aplicaciones-ios-de-ocio-y-bienestar/", devices: ["ios"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/IOS-Aplicaciones-300x200.jpg" },
+
+    { module: 3, name: "Trámites con la administración (Android/iOS)", url: "https://aulavirtual.afundacion.org/producto/tramites-con-la-administracion-para-ios-y-android/", devices: ["android","ios","unknown"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/08/tramitesconlaadministracion-1536x1024.jpg" },
+
+    { module: 4, name: "WhatsApp y otras redes sociales (Android)", url: "https://aulavirtual.afundacion.org/producto/whatsapp-y-otras-redes-sociales-para-android/", devices: ["android"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/Android-Whatsapp-300x200.jpg" },
+    { module: 4, name: "WhatsApp y otras redes sociales (iOS)", url: "https://aulavirtual.afundacion.org/producto/whatsapp-y-otras-redes-sociales-para-ios/", devices: ["ios"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2024/03/IOS-Whatsapp-300x200.jpg" },
+
+    { module: 5, name: "Ciberseguridad", url: "https://aulavirtual.afundacion.org/producto/ciberseguridad/", devices: ["android","ios","unknown"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/04/ciberseguridad-1536x1024.jpg" },
+    { module: 5, name: "Recomendaciones de la policía", url: "https://aulavirtual.afundacion.org/producto/recomendaciones-de-la-policia/", devices: ["android","ios","unknown"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/04/recomendacionespolicia.png" },
+
+    { module: 6, name: "Aprende a utilizar la banca móvil y los cajeros de Abanca", url: "https://aulavirtual.afundacion.org/producto/aprende-a-utilizar-la-banca-movil-de-abanca/", devices: ["android","ios","unknown"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/04/bancamovil-1536x864.jpg" },
+
+    { module: 7, name: "Inteligencia artificial con ChatGPT", url: "https://aulavirtual.afundacion.org/igualdad-digital/", devices: ["android","ios","unknown"], img: "https://aulavirtual.afundacion.org/wp-content/uploads/2025/04/chat-gpt-1536x1229.jpg" }
+  ];
+
+  // =========================
+  // Escala 0–3 (misma estructura) con adaptación ligera por tipo de pregunta
+  // =========================
+  function getOptions(context = "skill") {
+    // Escala común 0–3 (una sola frase por opción)
+    // Requisito: las dos respuestas afirmativas (2 y 3) usan círculo en fondo verde
+    const base = [
+      { value: 0, icon: "❌", circleBg: "bg-red-100", circleFg: "text-red-600" },
+      { value: 1, icon: "🤔", circleBg: "bg-yellow-100", circleFg: "text-yellow-700" },
+      { value: 2, icon: "👍", circleBg: "bg-green-100", circleFg: "text-green-700" },
+      { value: 3, icon: "⭐", circleBg: "bg-green-100", circleFg: "text-green-700" }
+    ];
+
+    const texts = [
+      "No sé hacerlo",
+      "Solo podría hacerlo con ayuda",
+      "Puedo hacerlo por mi cuenta, aunque tengo dudas",
+      "Sí, sé hacerlo con seguridad y autonomía"
+    ];
+
+    return base.map((b, i) => ({ ...b, text: texts[i] }));
+  }
+
+  // =========================
+  // Módulos + orden (para prescripción)
+  // =========================
+  const moduleTitles = {
+    0:"Empezando desde cero",
+    1:"Tu mejor aliado",
+    2:"Aplicaciones útiles",
+    3:"Trámites con la administración",
+    4:"WhatsApp y redes sociales",
+    5:"Ciberseguridad",
+    6:"Cajeros y banca móvil",
+    7:"Inteligencia artificial (ChatGPT)"
+  };
+  const moduleOrder = [0,1,4,2,3,5,6,7];
+
+  // =========================
+  // Preguntas (24) — 3 por módulo (0–7)
+  // IA (M7) NO entra en barras, pero SÍ entra en índice ponderado y plan
+  // =========================
+  const questions = [
+    // M0 — Uso del móvil
+    { module:0, theme:THEME.MOBILE, iconKey:"phone", question:"¿Sabes identificar las partes principales de tu teléfono (botones, cámara, pantalla)?", options:getOptions("skill") },
+    { module:0, theme:THEME.MOBILE, iconKey:"touch", question:"¿Sabes manejarte con la pantalla táctil (tocar, deslizar, ampliar) para moverte por el móvil?", options:getOptions("skill") },
+    { module:0, theme:THEME.MOBILE, iconKey:"wifi",  question:"¿Sabes conectarte a Internet desde el móvil (WiFi o datos móviles)?", options:getOptions("skill") },
+
+    // M1 — Uso del móvil
+    { module:1, theme:THEME.MOBILE, iconKey:"settings", question:"¿Sabes cambiar ajustes del móvil (letra, volumen, brillo) cuando lo necesitas?", options:getOptions("skill") },
+    { module:1, theme:THEME.MOBILE, iconKey:"download", question:"¿Sabes descargar e instalar una aplicación nueva?", options:getOptions("skill") },
+    { module:1, theme:THEME.MOBILE, iconKey:"folder", question:"¿Sabes guardar y encontrar un archivo o una foto en tu móvil (por ejemplo, en la galería o en archivos)?", options:getOptions("skill") },
+
+    // M2 — Uso del móvil
+    { module:2, theme:THEME.MOBILE, iconKey:"media", question:"¿Sabes usar aplicaciones de ocio (música, radio o vídeos) cuando te apetece?", options:getOptions("use") },
+    { module:2, theme:THEME.MOBILE, iconKey:"map", question:"¿Sabes usar una app de mapas (por ejemplo, Google Maps) para orientarte o llegar a un sitio?", options:getOptions("skill") },
+    { module:2, theme:THEME.MOBILE, iconKey:"accessibility", question:"¿Sabes ajustar opciones útiles del móvil (por ejemplo, tamaño de texto o ayudas visuales/sonido) si lo necesitas?", options:getOptions("skill") },
+
+    // M3 — Trámites y servicios
+    { module:3, theme:THEME.SERVICES, iconKey:"appointment", question:"¿Sabes pedir una cita (médica u otra) por Internet desde el móvil?", options:getOptions("skill") },
+    { module:3, theme:THEME.SERVICES, iconKey:"portal", question:"¿Sabes acceder a páginas o aplicaciones oficiales para hacer un trámite (salud, ayuntamiento, etc.)?", options:getOptions("skill") },
+    { module:3, theme:THEME.SERVICES, iconKey:"id", question:"¿Sabes usar un sistema de identificación digital (Cl@ve, certificado digital o DNIe) cuando se necesita?", options:getOptions("skill") },
+
+    // M4 — Comunicación
+    { module:4, theme:THEME.COMM, iconKey:"chat", question:"¿Sabes usar WhatsApp para enviar y responder mensajes?", options:getOptions("use") },
+    { module:4, theme:THEME.COMM, iconKey:"share", question:"¿Sabes enviar fotos o audios por WhatsApp?", options:getOptions("skill") },
+    { module:4, theme:THEME.COMM, iconKey:"video", question:"¿Sabes hacer una videollamada (por WhatsApp u otra app)?", options:getOptions("skill") },
+
+    // M5 — Seguridad digital
+    { module:5, theme:THEME.SECURITY, iconKey:"scam", question:"¿Sabes detectar mensajes sospechosos o estafas (por ejemplo, phishing) antes de pinchar?", options:getOptions("skill") },
+    { module:5, theme:THEME.SECURITY, iconKey:"password", question:"¿Sabes crear y usar contraseñas seguras (y diferentes) para tus cuentas?", options:getOptions("skill") },
+    { module:5, theme:THEME.SECURITY, iconKey:"update", question:"¿Sabes mantener el móvil actualizado (sistema y apps) para estar más protegido/a?", options:getOptions("habit") },
+
+    // M6 — Finanzas digitales
+    { module:6, theme:THEME.FINANCE, iconKey:"atm", question:"¿Sabes utilizar un cajero automático para operaciones básicas?", options:getOptions("skill") },
+    { module:6, theme:THEME.FINANCE, iconKey:"banking", question:"¿Sabes consultar movimientos o realizar operaciones desde la banca móvil?", options:getOptions("skill") },
+    { module:6, theme:THEME.FINANCE, iconKey:"transfer", question:"¿Sabes enviar dinero (transferencia o Bizum) desde el móvil si lo necesitas?", options:getOptions("skill") },
+
+    // M7 — IA (extra)
+    { module:7, theme:null, iconKey:"ai", question:"¿Sabes utilizar una herramienta de inteligencia artificial (como ChatGPT)?", options:getOptions("use") },
+    { module:7, theme:null, iconKey:"ai", question:"¿Sabes hacer una pregunta clara para obtener una respuesta útil en una herramienta de IA?", options:getOptions("skill") },
+    { module:7, theme:null, iconKey:"ai", question:"¿Sabes revisar la respuesta de la IA antes de usarla (por ejemplo, contrastando si es correcta)?", options:getOptions("skill") }
+  ];
+
+  // =========================
+  // START: device selection
+  // =========================
+  function selectDevice(type) {
+    deviceType = type;
+    ["android","ios","unknown"].forEach(t => document.getElementById(`device-${t  const startBtn = document.getElementById("startBtn");
+  if (startBtn) startBtn.disabled = false;
+}`).classList.remove("selected"));
+    document.getElementById(`device-${type}`).classList.add("selected");
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("startHint").textContent = "Listo. Puedes comenzar el test.";
+  }
+
+  function startTest() {
+    userName = (document.getElementById("nameInput").value || "").trim();
+    answers = new Array(questions.length).fill(null);
+    currentQuestionIndex = 0;
+
+    document.getElementById("welcomeScreen").classList.add("hidden");
+    document.getElementById("testScreen").classList.remove("hidden");
+    document.getElementById("totalQuestions").textContent = String(questions.length);
+    renderQuestion(true);
+  }
+
+  function previousQuestion() {
+    if (currentQuestionIndex <= 0) return;
+    currentQuestionIndex--;
+    renderQuestion(true);
+  }
+
+  function nextQuestion() {
+    if (answers[currentQuestionIndex] === null) return;
+    if (currentQuestionIndex < questions.length - 1) {
+      currentQuestionIndex++;
+      renderQuestion(true);
+    }
+  }
+
+  function finishTest() {
+    if (answers[currentQuestionIndex] === null) return;
+    document.getElementById("testScreen").classList.add("hidden");
+    document.getElementById("resultsScreen").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    calculateAndRenderResults();
+  }
+
+  function resetTest() {
+    document.getElementById("resultsScreen").classList.add("hidden");
+    document.getElementById("welcomeScreen").classList.remove("hidden");
+    document.getElementById("nameInput").value = "";
+    deviceType = null;
+    ["android","ios","unknown"].forEach(t => document.getElementById(`device-${t}`).classList.remove("selected"));
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("startHint").textContent = "Selecciona tu dispositivo para empezar.";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // =========================
+  // QUESTION RENDER
+  // =========================
+  function renderQuestion(withInAnim = false) {
+    // Safety check: ensure question exists
+    if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.length) {
+      console.error('Invalid question index:', currentQuestionIndex);
+      return;
+    }
+    
+    const q = questions[currentQuestionIndex];
+    const current = currentQuestionIndex + 1;
+    const percent = Math.round((currentQuestionIndex / (questions.length - 1)) * 100);
+
+    document.getElementById("currentQuestion").textContent = String(current);
+    document.getElementById("progressPercent").textContent = `${percent}%`;
+    document.getElementById("progressBar").style.width = `${percent}%`;
+
+    document.getElementById("themeBadge").textContent = q.theme ? `Área: ${q.theme}` : "Área: Innovación (IA)";
+
+    document.getElementById("questionIcon").innerHTML = iconSvg(q.iconKey);
+    document.getElementById("questionText").textContent = q.question;
+
+    const optionsContainer = document.getElementById("optionsContainer");
+    optionsContainer.innerHTML = "";
+
+    q.options.forEach((opt, idx) => {
+      const isSelected = answers[currentQuestionIndex] === idx;
+      const card = document.createElement("div");
+      card.className = `option-card border-2 rounded-2xl p-5 bg-white min-h-[130px] flex items-center ${isSelected ? "selected" : ""}`;
+      card.style.borderColor = isSelected ? "var(--afundacion-primary)" : "#D1D5DB";
+      card.onclick = () => selectOption(idx);
+
+      card.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center text-3xl ${opt.circleBg} ${opt.circleFg}">
+            <span style="line-height:1;">${opt.icon}</span>
+          </div>
+          <div class="font-semibold text-gray-900 text-lg">${opt.text}</div>
+        </div>
+      `;
+      optionsContainer.appendChild(card);
+    });
+
+    document.getElementById("prevBtn").disabled = currentQuestionIndex === 0;
+
+    const isLast = currentQuestionIndex === questions.length - 1;
+    const hasAnswer = answers[currentQuestionIndex] !== null;
+
+    document.getElementById("nextBtn").classList.toggle("hidden", isLast);
+    document.getElementById("finishBtn").classList.toggle("hidden", !isLast);
+
+    document.getElementById("nextBtn").disabled = !hasAnswer;
+    document.getElementById("finishBtn").disabled = !hasAnswer;
+
+    if (withInAnim) {
+      const card = document.getElementById("testCard");
+      card.classList.remove("question-transition-in");
+      void card.offsetWidth;
+      card.classList.add("question-transition-in");
+    }
+  }
+
+  // =========================
+  // AUTO-ADVANCE
+  // =========================
+  function selectOption(optionIdx) {
+    answers[currentQuestionIndex] = optionIdx;
+    renderQuestion(false);
+
+    const isLast = currentQuestionIndex === questions.length - 1;
+    document.getElementById("nextBtn").disabled = false;
+    document.getElementById("finishBtn").disabled = false;
+
+    if (!AUTO_ADVANCE || isLast) return;
+
+    const card = document.getElementById("testCard");
+    card.classList.add("advance-pop");
+
+    setTimeout(() => {
+      card.classList.remove("advance-pop");
+      card.classList.add("question-transition-out");
+
+      setTimeout(() => {
+        card.classList.remove("question-transition-out");
+        currentQuestionIndex++;
+        
+        // Safety check before rendering
+        if (currentQuestionIndex < questions.length) {
+          renderQuestion(true);
+          
+          // Scroll to top on mobile
+          if (window.innerWidth < 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      }, 180);
+    }, AUTO_ADVANCE_DELAY_MS);
+  }
+
+  // =========================
+  // CALCULATIONS
+  // =========================
+  function computeModuleScores() {
+    const moduleScores = {};
+    for (let m = 0; m <= 7; m++) moduleScores[m] = 0;
+
+    questions.forEach((q, idx) => {
+      if (answers[idx] === null || answers[idx] === undefined) return; // Skip unanswered
+      const val = q.options[answers[idx]].value;
+      moduleScores[q.module] += val; // 0..9 por módulo
+    });
+    return moduleScores;
+  }
+
+  function computeThemePercents() {
+    const themeScores = {};
+    const themeMax = {};
+
+    questions.forEach((q, idx) => {
+      if (!q.theme) return; // IA no entra en barras
+      if (answers[idx] === null || answers[idx] === undefined) return; // Skip unanswered
+      const val = q.options[answers[idx]].value;
+
+      if (!themeScores[q.theme]) { themeScores[q.theme] = 0; themeMax[q.theme] = 0; }
+      themeScores[q.theme] += val;
+      themeMax[q.theme] += 3;
+    });
+
+    const themes = Object.keys(themeScores).map(t => ({
+      theme: t,
+      score: themeScores[t],
+      max: themeMax[t],
+      percent: (themeScores[t] / themeMax[t]) * 100
+    }));
+
+    themes.sort((a, b) => a.percent - b.percent);
+    return themes;
+  }
+
+  function computeWeightedIndexPercent(moduleScores) {
+    let weighted = 0;
+    for (const m in moduleScores) weighted += moduleScores[m] * (moduleWeights[m] || 1.0);
+    return Math.max(0, Math.min(100, (weighted / 81) * 100));
+  }
+
+  function determineLevel(percent) {
+    if (percent < 30) return { title:"🌱 Nivel inicial", desc:"Necesitas apoyo frecuente en tareas digitales. Con un plan paso a paso ganarás autonomía rápidamente." };
+    if (percent < 50) return { title:"📘 Nivel básico", desc:"Ya haces algunas tareas, pero a menudo necesitas ayuda. Consolidar tu base te dará más seguridad." };
+    if (percent < 75) return { title:"📗 Nivel intermedio", desc:"Tienes autonomía en muchas tareas. Reforzar áreas clave te permitirá ganar confianza y seguridad." };
+    return { title:"🚀 Nivel avanzado", desc:"Te manejas con autonomía y seguridad. Puedes ampliar competencias y explorar herramientas más avanzadas." };
+  }
+
+  // =========================
+  // GRAPHICS
+  // =========================
+  function renderAnimatedThemeBars(themePercents) {
+    const container = document.getElementById("themeBars");
+    container.innerHTML = "";
+
+    themePercents.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "bg-gray-50 rounded-2xl p-4 border";
+      row.style.borderColor = "var(--afundacion-secondary)";
+
+      row.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-semibold text-gray-900">${escapeHtml(item.theme)}</h3>
+          <span class="text-sm font-bold" style="color: var(--afundacion-primary);">${Math.round(item.percent)}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div class="h-3 rounded-full transition-all duration-700 ease-out" style="width: 0%; background: var(--afundacion-primary);"></div>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">${item.score}/${item.max}</p>
+      `;
+
+      container.appendChild(row);
+      const bar = row.querySelector("div[style*='width: 0%']");
+      requestAnimationFrame(() => { bar.style.width = `${item.percent}%`; });
+    });
+  }
+
+  function renderAnimatedDonut(percent, labelText) {
+    const container = document.getElementById("donutContainer");
+    container.innerHTML = "";
+
+    const size = 240, stroke = 20;
+    const r = (size - stroke) / 2;
+    const c = 2 * Math.PI * r;
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", size);
+    svg.setAttribute("height", size);
+    svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+
+    const bg = document.createElementNS(svg.namespaceURI, "circle");
+    bg.setAttribute("cx", size/2); bg.setAttribute("cy", size/2); bg.setAttribute("r", r);
+    bg.setAttribute("fill", "none");
+    bg.setAttribute("stroke", "rgba(255,255,255,0.25)");
+    bg.setAttribute("stroke-width", stroke);
+
+    const fg = document.createElementNS(svg.namespaceURI, "circle");
+    fg.setAttribute("cx", size/2); fg.setAttribute("cy", size/2); fg.setAttribute("r", r);
+    fg.setAttribute("fill", "none");
+    fg.setAttribute("stroke", "white");
+    fg.setAttribute("stroke-width", stroke);
+    fg.setAttribute("stroke-linecap", "round");
+    fg.setAttribute("stroke-dasharray", c);
+    fg.setAttribute("stroke-dashoffset", c);
+    fg.style.transition = "stroke-dashoffset 1600ms ease-out";
+    fg.style.transform = "rotate(-90deg)";
+    fg.style.transformOrigin = "50% 50%";
+
+    const text = document.createElementNS(svg.namespaceURI, "text");
+    text.setAttribute("x", "50%");
+    text.setAttribute("y", "50%");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("fill", "white");
+    text.setAttribute("font-size", "36");
+    text.setAttribute("font-weight", "700");
+    text.textContent = "0%";
+
+    const sub = document.createElementNS(svg.namespaceURI, "text");
+    sub.setAttribute("x", "50%");
+    sub.setAttribute("y", "65%");
+    sub.setAttribute("dominant-baseline", "middle");
+    sub.setAttribute("text-anchor", "middle");
+    sub.setAttribute("fill", "rgba(255,255,255,0.95)");
+    sub.setAttribute("font-size", "13");
+    sub.textContent = labelText || "";
+
+    svg.appendChild(bg); svg.appendChild(fg); svg.appendChild(text); svg.appendChild(sub);
+    container.appendChild(svg);
+
+    const target = Math.max(0, Math.min(100, percent));
+    requestAnimationFrame(() => {
+      const offset = c * (1 - target/100);
+      fg.setAttribute("stroke-dashoffset", offset);
+    });
+
+    const start = performance.now(), duration = 1600;
+    function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      text.textContent = `${Math.round(target * t)}%`;
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // =========================
+  // PLAN (prescripción)
+  // =========================
+  function courseLinksForModule(moduleNum) {
+    const dt = deviceType || "unknown";
+    const candidates = courses.filter(c => c.module === moduleNum && (c.devices || []).includes(dt));
+    if (candidates.length > 0) return candidates;
+    return courses.filter(c => c.module === moduleNum);
+  }
+
+  function buildItinerary(moduleScores) {
+    const entries = Object.keys(moduleScores).map(k => ({ module: Number(k), score: moduleScores[k] }));
+    const orderIndex = m => (moduleOrder.indexOf(m) === -1 ? 999 : moduleOrder.indexOf(m));
+    entries.sort((a,b) => (a.score !== b.score) ? (a.score - b.score) : (orderIndex(a.module) - orderIndex(b.module)));
+    return entries;
+  }
+
+  function labelForModuleScore(score) {
+    if (score <= 2) return { badge:"Necesidad alta", cls:"bg-red-100 text-red-800 border-red-200" };
+    if (score <= 4) return { badge:"Necesidad media", cls:"bg-yellow-100 text-yellow-800 border-yellow-200" };
+    if (score <= 6) return { badge:"En progreso", cls:"bg-blue-100 text-blue-800 border-blue-200" };
+    return { badge:"Consolidado", cls:"bg-green-100 text-green-800 border-green-200" };
+  }
+
+  // Manejo de error de imagen
+  function handleImageError(img) {
+    img.style.display = 'none';
+    const placeholder = img.nextElementSibling;
+    if (placeholder) placeholder.style.display = 'flex';
+  }
+
+  function renderPlan(itinerary) {
+    const container = document.getElementById("planContainer");
+    container.innerHTML = "";
+
+    const phase1 = itinerary.filter(x => x.score <= 4 && x.module !== 7);
+    const phase2 = itinerary.filter(x => x.score >= 5 && x.score <= 6 && x.module !== 7);
+    const phase3 = itinerary.filter(x => x.score >= 7 && x.module !== 7);
+    const ia = itinerary.find(x => x.module === 7);
+
+    const blocks = [
+      { title:"🔴 Fase 1. Refuerza tu base", items: phase1, hint:"Empezar por aquí te dará autonomía rápidamente." },
+      { title:"🟡 Fase 2. Consolida tu autonomía", items: phase2, hint:"Aquí ganarás seguridad y soltura." },
+      { title:"🟢 Fase 3. Amplía tus competencias", items: phase3, hint:"Cuando domines lo anterior, este es tu siguiente salto." }
+    ];
+
+    blocks.forEach(block => {
+      if (block.items.length === 0) return;
+
+      const section = document.createElement("div");
+      section.className = "bg-white rounded-2xl border p-5";
+      section.style.borderColor = "var(--afundacion-secondary)";
+      section.innerHTML = `
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">${block.title}</h3>
+          <p class="text-gray-600 text-sm mt-1">${block.hint}</p>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4" data-items></div>
+      `;
+
+      const itemsContainer = section.querySelector("[data-items]");
+      block.items.forEach(({ module, score }) => {
+        const links = courseLinksForModule(module);
+
+        // Si hay varios cursos (por ejemplo, Android/iOS), mostramos cada uno como tarjeta independiente.
+        // Si no hay links (caso raro), mostramos una tarjeta genérica.
+        if (!links || links.length === 0) {
+          const fallback = document.createElement("div");
+          fallback.className = "bg-white rounded-2xl border overflow-hidden hover:shadow-lg transition-all";
+          fallback.style.borderColor = "var(--afundacion-secondary)";
+          fallback.innerHTML = `
+            <div class="p-5">
+              <div class="text-sm text-gray-600">Curso recomendado</div>
+              <div class="font-bold text-gray-900 mt-1">${escapeHtml(moduleTitles[module])}</div>
+              <a href="https://aulavirtual.afundacion.org/igualdad-digital/" target="_blank"
+                 class="inline-flex items-center gap-2 mt-3 text-sm font-semibold hover:underline"
+                 style="color: var(--afundacion-primary);">
+                Ver cursos de Igualdad Digital <span aria-hidden="true">↗</span>
+              </a>
+            </div>`;
+          itemsContainer.appendChild(fallback);
+          return;
+        }
+
+        links.forEach(c => {
+          const courseCard = document.createElement("div");
+          courseCard.className = "bg-white rounded-2xl border overflow-hidden hover:shadow-lg transition-all";
+          courseCard.style.borderColor = "var(--afundacion-secondary)";
+
+          courseCard.innerHTML = `
+            <div class="relative" style="height: 150px;">
+              <img src="${c.img}" alt="${escapeHtml(c.name)}"
+                   class="w-full h-full object-cover"
+                   loading="lazy"
+                   onerror="this.style.display='none'; this.parentElement.style.background='var(--afundacion-light)'; this.parentElement.insertAdjacentHTML('beforeend', '<div class=&quot;w-full h-full flex items-center justify-center text-4xl&quot; style=&quot;color: var(--afundacion-primary);&quot;>📚</div>');">
+            </div>
+            <div class="p-5">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">Curso recomendado</div>
+              <a href="${c.url}" target="_blank"
+                 class="block mt-1 text-base font-bold leading-snug hover:underline"
+                 style="color: var(--afundacion-primary);">
+                ${escapeHtml(c.name)} <span aria-hidden="true">↗</span>
+              </a>
+              <div class="mt-3">
+                <a href="${c.url}" target="_blank"
+                   class="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl text-white font-semibold"
+                   style="background: var(--afundacion-primary);">
+                  Ver curso
+                </a>
+              </div>
+            </div>
+          `;
+
+          itemsContainer.appendChild(courseCard);
+        });
+      });
+
+      container.appendChild(section);
+    });
+
+    // IA como extra
+    if (ia) {
+      const section = document.createElement("div");
+      section.className = "bg-white rounded-2xl border p-5 mt-5";
+      section.style.borderColor = "var(--afundacion-secondary)";
+      section.innerHTML = `
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">🤖 Extra. Inteligencia artificial</h3>
+          <p class="text-gray-600 text-sm mt-1">Si te interesa, este curso te ayuda a empezar con confianza.</p>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4" data-items></div>
+      `;
+
+      const itemsContainer = section.querySelector("[data-items]");
+      const links = courseLinksForModule(7);
+
+      (links && links.length ? links : [{name:"Chat GPT", url:"https://aulavirtual.afundacion.org/igualdad-digital/", img:""}]).forEach(c => {
+        const courseCard = document.createElement("div");
+        courseCard.className = "bg-white rounded-2xl border overflow-hidden hover:shadow-lg transition-all";
+        courseCard.style.borderColor = "var(--afundacion-secondary)";
+
+        courseCard.innerHTML = `
+          <div class="relative" style="height: 150px;">
+            <img src="${c.img || ''}" alt="${escapeHtml(c.name)}"
+                 class="w-full h-full object-cover"
+                 loading="lazy"
+                 onerror="this.style.display='none'; this.parentElement.style.background='var(--afundacion-light)'; this.parentElement.insertAdjacentHTML('beforeend', '<div class=&quot;w-full h-full flex items-center justify-center text-4xl&quot; style=&quot;color: var(--afundacion-primary);&quot;>🤖</div>');">
+          </div>
+          <div class="p-5">
+            <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">Curso recomendado</div>
+            <a href="${c.url}" target="_blank"
+               class="block mt-1 text-base font-bold leading-snug hover:underline"
+               style="color: var(--afundacion-primary);">
+              ${escapeHtml(c.name)} <span aria-hidden="true">↗</span>
+            </a>
+            <div class="mt-3">
+              <a href="${c.url}" target="_blank"
+                 class="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl text-white font-semibold"
+                 style="background: var(--afundacion-primary);">
+                Ver curso
+              </a>
+            </div>
+          </div>
+        `;
+
+        itemsContainer.appendChild(courseCard);
+      });
+
+      container.appendChild(section);
+    }
+  }
+
+  function escapeHtml(str) {
+    return (str || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      "\"":"&quot;",
+      "'":"&#039;"
+    }[m]));
+  }
+
+  // =========================
+  // FINAL RENDER
+  // =========================
+  function calculateAndRenderResults() {
+    const moduleScores = computeModuleScores();
+    const themePercents = computeThemePercents();
+    const weightedPercent = computeWeightedIndexPercent(moduleScores);
+    const level = determineLevel(weightedPercent);
+
+    const intro = userName
+      ? `${escapeHtml(userName)}, has completado el test. Aquí tienes tu resultado y tu plan personalizado.`
+      : "Has completado el test. Aquí tienes tu plan personalizado.";
+    document.getElementById("resultsIntro").textContent = intro;
+
+    renderAnimatedDonut(weightedPercent, "Confianza digital");
+    document.getElementById("levelTitle").textContent = level.title;
+    document.getElementById("levelDescription").textContent = level.desc;
+
+    renderAnimatedThemeBars(themePercents);
+
+    const itinerary = buildItinerary(moduleScores);
+    renderPlan(itinerary);
+  }
+</script>
+</body>
+</html>
